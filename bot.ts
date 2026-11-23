@@ -4,7 +4,7 @@ import { Client, Events, GatewayIntentBits } from "discord.js";
 import { execFile } from "node:child_process";
 import { extname, join } from "node:path";
 import { promisify } from "node:util";
-import { tidy } from "./claude.ts";
+import { type Item, tidy } from "./claude.ts";
 import { append, hms, saveAsset, ymd } from "./daily.ts";
 
 const { DISCORD_TOKEN, OWNER_ID, VAULT } = process.env;
@@ -32,23 +32,33 @@ client.on(Events.MessageCreate, async (msg) => {
       names.push(name);
     }
     const text = msg.content.trim();
-    let items: string[] = [];
+    let items: Item[] = [];
     let ok = true;
     if (text) {
       try {
-        items = await tidy(kind, text, names.map((n) => join(assets, n)), assets);
+        items = await tidy(kind, text, names.map((n) => join(assets, n)), assets, ymd(now));
       } catch (e) {
         // メモが消えないように、原文を 1 行ずつ書く
         console.error(e);
         ok = false;
-        items = text.split("\n").map((l) => l.trim()).filter(Boolean);
+        items = text.split("\n").map((l) => l.trim()).filter(Boolean).map((t) => ({ text: t, date: ymd(now), photo: false }));
       }
     }
-    // 画像は最後の項目に付ける（本文がなければ画像だけの項目にする）
-    if (names.length) items.push([items.pop(), ...names.map((n) => `![[${n}]]`)].filter(Boolean).join(" "));
+    // 画像は Claude が photo を付けた項目に付ける（なければ最後の項目、本文がなければ画像だけの項目）
+    if (names.length) {
+      if (!items.length) items.push({ text: "", date: ymd(now), photo: true });
+      const target = items.find((i) => i.photo) ?? items[items.length - 1];
+      target.text = [target.text, ...names.map((n) => `![[${n}]]`)].filter(Boolean).join(" ");
+    }
     if (!items.length) return;
-    if (kind === "tasks") await append(VAULT, "Tasks", items.map((t) => `- [ ] ${t}`), now);
-    else await append(VAULT, "Jottings", items.map((l) => `- ${l}`), now);
+    // その日の Daily に書く。変な日付や未来の日付なら今日にする
+    const today = ymd(now);
+    for (const i of items) if (!/^\d{4}-\d{2}-\d{2}$/.test(i.date) || i.date > today) i.date = today;
+    for (const date of new Set(items.map((i) => i.date))) {
+      const lines = items.filter((i) => i.date === date).map((i) => (kind === "tasks" ? `- [ ] ${i.text}` : `- ${i.text}`));
+      const [y, m, d] = date.split("-").map(Number);
+      await append(VAULT, kind === "tasks" ? "Tasks" : "Jottings", lines, new Date(y, m - 1, d));
+    }
     await msg.react(ok ? "✅" : "⚠️");
   } catch (e) {
     console.error(e);
