@@ -70,7 +70,10 @@ client.on(Events.MessageCreate, async (msg) => {
       const res = await fetch(a.url);
       if (!res.ok) throw new Error(`添付を取れなかった: ${res.status}`);
       const name = `${ymd(now)}-${hms(now)}-${i}${extname(a.name).toLowerCase() || ".png"}`;
-      embeds.push(`![[${await saveAsset(VAULT, name, await res.arrayBuffer())}]]`);
+      await saveAsset(VAULT, name, await res.arrayBuffer());
+      // 写真は長辺 1600px・JPEG 品質 70 に縮める（macOS の sips。拡張子を変えないので PNG は縮めるだけ、GIF は動きが消えるので触らない）
+      if (/\.(jpe?g|png|heic)$/.test(name)) await promisify(execFile)("/usr/bin/sips", ["-Z", "1600", "-s", "formatOptions", "70", join(VAULT, "99_Assets", name)]);
+      embeds.push(`![[${name}]]`);
     }
     // 画像は最後の項目に付ける（本文がなければ画像だけの項目にする）
     if (embeds.length) items.push([items.pop(), ...embeds].filter(Boolean).join(" "));
