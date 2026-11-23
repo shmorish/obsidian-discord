@@ -2,9 +2,9 @@
 
 Discord に送ったメッセージを、Obsidian Vault の今日の Daily（`01_Daily/YYYY-MM-DD.md`）に足す bot。Mac で常駐させる。
 
-- `#jottings` か `#tasks` に送ると、Claude（`claude -p` の Haiku、ツールなし）がやることは `## Tasks` に `- [ ] …`、それ以外は `## Jottings` に `- …` と振り分け、言葉を整える
+- `#jottings` に送ると `## Jottings` に `- …`、`#tasks` に送ると `## Tasks` に `- [ ] …` を足す。言葉は Claude（`claude -p` の Haiku、ツールなし）が整える
 - 画像を付けると `99_Assets/` に保存して Jottings に `![[…]]` で埋め込む
-- 書けたら ✅、Claude が失敗して原文のまま Jottings に書いたら ⚠️、書けなかったら ❌ が付く
+- 書けたら ✅、Claude が失敗して原文のまま書いたら ⚠️、書けなかったら ❌ が付く
 - 今日の Daily がなければ `90_Templates/Daily.md` から作る（Obsidian が閉じていても書ける）。push は Vault の autogit に任せる
 - `OWNER_ID` の人のメッセージだけ扱う
 
