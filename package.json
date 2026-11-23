@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node --env-file=.env bot.ts",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "discord.js": "14.28.1"
+  }
+}
