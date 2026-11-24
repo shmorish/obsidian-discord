@@ -5,6 +5,7 @@ Discord に送ったメッセージを、Obsidian の Daily ノートに書き�
 ## できること
 
 - `#jottings` に送ると `## Jottings` に `- …`、`#tasks` に送ると `## Tasks` に `- [ ] …` を足す
+- 「金曜までに経費精算する」のように期限があるタスクは、[Tasks](https://github.com/obsidian-tasks-group/obsidian-tasks) プラグインの書式で `- [ ] 経費精算する 📅 2026-11-27` と書く
 - 文章は Claude Code（`claude -p`）が短く自然な日本語に整える
 - 「正式名調べて」のように頼むと、Claude が Web で調べて結果を文章に入れ込む（頼んだ文や出典は残さない）
 - 「一昨日」「先週の金曜」のような過去の日の話は、その日の Daily に書く。Daily がまだなければテンプレートから作る
