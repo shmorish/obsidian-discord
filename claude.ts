@@ -14,7 +14,7 @@ const SCHEMA = JSON.stringify({
       type: "array",
       items: {
         type: "object",
-        properties: { text: { type: "string" }, date: { type: "string" }, photo: { type: "boolean" } },
+        properties: { text: { type: "string" }, date: { type: "string" }, photo: { type: "boolean" }, due: { type: "string" } },
         required: ["text", "date", "photo"],
       },
     },
@@ -23,10 +23,10 @@ const SCHEMA = JSON.stringify({
 });
 const KIND = {
   jottings: "メモ・気づき・出来事",
-  tasks: "やること（タスク）。1 項目 1 つの行動にする",
+  tasks: "やること（タスク）。1 項目 1 つの行動にする。期限があれば due に YYYY-MM-DD で入れ、「〇日までに」のような期限の言い回しは文から消す（期限がなければ due は付けない）",
 };
 export type Kind = keyof typeof KIND;
-export type Item = { text: string; date: string; photo: boolean };
+export type Item = { text: string; date: string; photo: boolean; due?: string };
 
 const prompt = (kind: Kind, text: string, images: string[], today: string) => `Discord から Obsidian の Daily に放り込まれた${KIND[kind]}を整えて items に入れる。今日は ${today}。
 - 1 つの話は 1 項目にまとめ、別の話は分ける。言葉は意味を変えずに短く自然な日本語に整える。行頭の記号は付けない

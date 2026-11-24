@@ -55,7 +55,7 @@ client.on(Events.MessageCreate, async (msg) => {
     const today = ymd(now);
     for (const i of items) if (!/^\d{4}-\d{2}-\d{2}$/.test(i.date) || i.date > today) i.date = today;
     for (const date of new Set(items.map((i) => i.date))) {
-      const lines = items.filter((i) => i.date === date).map((i) => (kind === "tasks" ? `- [ ] ${i.text}` : `- ${i.text}`));
+      const lines = items.filter((i) => i.date === date).map((i) => (kind === "tasks" ? `- [ ] ${i.text}${i.due ? ` 📅 ${i.due}` : ""}` : `- ${i.text}`));
       const [y, m, d] = date.split("-").map(Number);
       await append(VAULT, kind === "tasks" ? "Tasks" : "Jottings", lines, new Date(y, m - 1, d));
     }
